@@ -1,0 +1,178 @@
+﻿@using Nike.Models;
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Bảng điều khiển";
+    Layout = "~/Areas/Admin/Views/Shared/_layoutadmin.cshtml";
+    QuanLySanPhamEntities _db = new QuanLySanPhamEntities();
+    var dsKhachHang = _db.KhachHangs.ToList();
+    var dsProduct = _db.Products.ToList();
+    var dsOrder = _db.Orders.ToList();
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="app-title">
+            <ul class="app-breadcrumb breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><b>Bảng điều khiển</b></a></li>
+            </ul>
+            <div id="clock"></div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <!--Left-->
+    <div class="col-md-12 col-lg-6">
+        <div class="row">
+            <!-- col-6 -->
+            <div class="col-md-6">
+                <div class="widget-small primary coloured-icon">
+                    <i class='icon bx bxs-user-account fa-3x'></i>
+                    <div class="info">
+                        <h4>Tổng khách hàng</h4>
+                        <p><b>@dsKhachHang.Count() khách hàng</b></p>
+                        <p class="info-tong">Tổng số khách hàng được quản lý.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- col-6 -->
+            <div class="col-md-6">
+                <div class="widget-small info coloured-icon">
+                    <i class='icon bx bxs-data fa-3x'></i>
+                    <div class="info">
+                        <h4>Tổng sản phẩm tồn kho</h4>
+                        <p><b>@dsProduct.Count() sản phẩm</b></p>
+                        <p class="info-tong">Tổng số sản phẩm được quản lý.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- col-6 -->
+            <div class="col-md-6">
+                <div class="widget-small warning coloured-icon">
+                    <i class='icon bx bxs-shopping-bags fa-3x'></i>
+                    <div class="info">
+                        <h4>Tổng đơn hàng</h4>
+                        <p><b>@dsOrder.Count() đơn hàng</b></p>
+                        <p class="info-tong">Tổng số hóa đơn bán hàng trong tháng.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- col-6 -->
+            <div class="col-md-6">
+                <div class="widget-small danger coloured-icon">
+                    <i class='icon bx bxs-error-alt fa-3x'></i>
+                    <div class="info">
+                        <h4>Sắp hết hàng</h4>
+                        <p>
+                            <b>
+                                @{
+                                    int var = 0;
+                                    foreach (var item in dsProduct)
+                                    {
+                                        if (item.SoLuong < 50 && item.SoLuong > 0)
+                                        {
+                                            var++;
+                                        }
+                                    }
+                                }
+
+                                @var sản phẩm
+                            </b>
+                        </p>
+                        <p class="info-tong">Số sản phẩm cảnh báo có số lượng dưới 50.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- col-12 -->
+            <div class="col-md-12">
+                <div class="tile">
+                    <h3 class="tile-title">Đơn hàng cần được xử lí</h3>
+                    <div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="100">Mã đơn hàng</th>
+                                    <th>Tên khách hàng</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in dsOrder)
+                                {
+                                <tr>
+                                    @if (item.Status == "Chưa giao hàng" || item.Status == "Đang giao hàng")
+                                    {
+                                        <td>@item.ID</td>
+                                        if (item.KhachHang != null)
+                                        {
+                                            <td>@item.KhachHang.FullName()</td>
+                                        }
+                                        else
+                                        {
+                                            <td>null</td>
+
+                                        }
+                                        <td>
+                                            @String.Format("{0:#,0}", item.ThanhTien) ₫
+                                        </td>
+                                        <td>
+                                            @switch (item.Status)
+                                            {
+                                                case "Chưa giao hàng":
+                                                    <span class="badge bg-info">@item.Status</span>
+                                                    break;
+                                                case "Đang giao hàng":
+                                                    <span class="badge bg-warning">@item.Status</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- / div trống-->
+                </div>
+            </div>
+            <!-- / col-12 -->
+        </div>
+    </div>
+    <!--END left-->
+    <!--Right-->
+    <div class="col-md-12 col-lg-6">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tile">
+                    <h3 class="tile-title">Thống kê số lượng sản phẩm bán được trong 12 tháng</h3>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <canvas class="embed-responsive-item" id="lineChartDemo"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="tile">
+                    <h3 class="tile-title">Thống kê số tiền bán được trong 12 tháng</h3>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <canvas class="embed-responsive-item" id="barChartDemo"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--END right-->
+</div>
+    <script>
+        var dsOrder = _db.Orders.ToList();
+        console.log(dsOrder)
+    </script>
+
+<style>
+    .tile{
+        height: 400px;
+        overflow: auto;
+    }
+</style>

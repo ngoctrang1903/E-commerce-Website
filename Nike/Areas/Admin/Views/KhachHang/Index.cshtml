@@ -1,0 +1,137 @@
+﻿@model IEnumerable<Nike.Models.KhachHang>
+
+@{
+    ViewBag.Title = "Quản lí khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_layoutadmin.cshtml";
+}
+
+<div class="app-title">
+    <ul class="app-breadcrumb breadcrumb side">
+        <li class="breadcrumb-item active"><a href="#"><b>Danh sách khách hàng</b></a></li>
+    </ul>
+    <div id="clock"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="tile">
+            <div class="tile-body">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        @using (Html.BeginForm("Index", "KhachHang", FormMethod.Get, new { @class = "dataTables_filter d-flex justify-content-end" }))
+                        {
+                            <label>
+                                Tìm kiếm:
+
+                                @Html.TextBox("searchStr", null, new { @class = "form-control form-control-sm", @placeholder = "Email khách hàng" })
+
+                            </label>
+                        }
+                    </div>
+                </div>
+                <dov class="row">
+                    <table class="table table-hover table-bordered js-copytextarea" cellpadding="0" cellspacing="0" border="0"
+                           id="sampleTable">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Họ Tên
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    Ảnh đại diện
+                                </th>
+                                <th>
+                                    Địa chỉ
+                                </th>
+                                <th>
+                                    Loại khách hàng
+                                </th>
+                                <th>
+                                    Số điện thoại
+                                </th>
+                                <th>
+                                    Chức năng
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.dsKH)
+                            {
+                                <tr>
+                                    <td>
+                                        @item.FullName()
+                                    </td>
+                                    <td>
+                                        @if (@item.Email == null)
+                                        {
+                                            <p>Không có email</p>
+                                        }
+                                        else
+                                        {
+                                            @item.Email
+                                        }
+                                    </td>
+                                    <td>
+                                        @if ((item.Picture) != null)
+                                        {
+                                            <img src="~/Hinh/KhachHang/@Url.Content(@item.Picture)" width="100" height="100" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/Hinh/NhanVien/default.png" width="100" height="100" />
+
+                                        }
+                                    </td>
+                                    <td>
+                                        @item.Address
+                                    </td>
+                                    <td>
+                                        @if (item.TichLuy < 50)
+                                        {
+                                            <p>Khách hàng vãng lai</p>
+                                        }
+                                        else if (item.TichLuy < 100)
+                                        {
+                                            <p>Khách hàng bạc</p>
+                                        }
+                                        else if (item.TichLuy < 150)
+                                        {
+                                            <p>Khách hàng vàng  </p>
+                                        }
+                                        else
+                                        {
+                                            <p>Khách hàng kim cương</p>
+                                        }
+
+                                    </td>
+                                    <td>
+                                        @item.Sdt
+                                    </td>
+                                    <td class="table-td-center">
+                                        <button class="btn btn-primary btn-sm user-btn" type="button" title="Xem thông tin"
+                                                    onclick="location.href='@Url.Action("Detail", "KhachHang",new { Id = item.idUser })'">
+                                            <i class="fas fa-user"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </dov>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
